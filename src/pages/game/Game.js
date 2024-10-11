@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Box, Flex, Text, Image } from "@chakra-ui/react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import BottomBoardList from "../../components/game/BottomBoardList";
 
 import BackgroundImg from "../../images/game_background.webp";
 import ScoreBoard from "../../components/game/ScoreBoard";
 import Dish from "../../components/game/Dish";
+import Fire from "../../images/fire.webp";
 
 export default function Game() {
     const location = useLocation();
+    const navigate = useNavigate();
     const queryParams = new URLSearchParams(location.search);
     const name = queryParams.get("name");
     const phone = queryParams.get("phone");
@@ -20,6 +22,7 @@ export default function Game() {
     const [countdown, setCountdown] = useState(3);
     const [gameStarted, setGameStarted] = useState(false);
     const [gameFinished, setGameFinished] = useState(false);
+    const [showScore, setShowScore] = useState(false);
 
     // 각 요리에 들어간 재료 수
     const [dishStatus, setDishStatus] = useState([0, 0, 0]);
@@ -40,6 +43,31 @@ export default function Game() {
         5: "noodle",
         6: "soup"
     });
+
+    // 게임 종료 후 점수 표시 및 메인 페이지로 리다이렉트
+    useEffect(() => {
+        if (gameFinished) {
+            // 2초 후 점수 표시
+            const showScoreTimer = setTimeout(() => {
+                setShowScore(true);
+            }, 2000);
+
+            // TODO: 여기에 점수 업데이트 API 호출 코드 작성하기
+
+
+            
+
+            // 4초 후 메인 페이지로 리다이렉트 (2초 대기 + 2초 점수 표시)
+            const redirectTimer = setTimeout(() => {
+                navigate('/ranking');
+            }, 5000);
+
+            return () => {
+                clearTimeout(showScoreTimer);
+                clearTimeout(redirectTimer);
+            };
+        }
+    }, [gameFinished, navigate, score]);
 
     // ingredients를 섞어주는 함수
     const shuffleIngredients = () => {
@@ -99,15 +127,12 @@ export default function Game() {
                     } else {
                         clearInterval(timer);
                         setGameFinished(true);
-
-                        
                         return 0;
                     }
                 });
             }, 1000);
         }
 
-        // 컴포넌트가 언마운트되거나 의존성이 변경될 때 타이머를 정리
         return () => {
             if (timer) {
                 clearInterval(timer);
@@ -164,21 +189,49 @@ export default function Game() {
                 </Flex>
             )}
             {gameFinished && (
-                <Flex
-                    position="absolute"
-                    top="0"
-                    left="0"
-                    right="0"
-                    bottom="0"
-                    backgroundColor="rgba(0,0,0,0.7)"
-                    justifyContent="center"
-                    alignItems="center"
-                    zIndex="10"
-                >
-                    <Text fontSize="96px" fontWeight="bold" color="white">
-                        Finish!
-                    </Text>
-                </Flex>
+                <Box>
+                    {!showScore ? (
+                        <Flex
+                            position="absolute"
+                            top="0"
+                            left="0"
+                            right="0"
+                            bottom="0"
+                            backgroundColor="rgba(0,0,0,0.7)"
+                            justifyContent="center"
+                            alignItems="center"
+                            flexDirection="column"
+                            zIndex="10"
+                        >
+                            <Text fontSize="96px" fontWeight="bold" color="white">
+                                Finish!
+                            </Text>
+                        </Flex>
+                    ) : (
+                        <Flex
+                            position="absolute"
+                            top="0"
+                            left="0"
+                            right="0"
+                            bottom="0"
+                            backgroundColor="black"
+                            justifyContent="center"
+                            alignItems="center"
+                            zIndex="10"
+                        >
+                            <Image src={Fire} alt="fire" w="70px" />
+                            <Text
+                                fontSize="50px"
+                                fontWeight="bold"
+                                bgGradient="linear(to-b, #CA1F00, #FF7528)"
+                                bgClip="text"
+                            >
+                                {score}점
+                            </Text>
+                            <Image src={Fire} alt="fire" w="70px" />
+                        </Flex>
+                    )}
+                </Box>
             )}
             <Box height="100%">
                 <Flex justifyContent="center" gap="16px" mt="15px">
