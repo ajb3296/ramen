@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Flex, Text, Image } from "@chakra-ui/react";
+import { Flex, Text, Image } from "@chakra-ui/react";
 
 import Dish1Img from "../../images/ramen1.webp";
 import Dish2Img from "../../images/ramen2.webp";

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Flex, Text, Image, Button } from "@chakra-ui/react";
+import { Flex, Text, Image, Button } from "@chakra-ui/react";
 
 import Rank from "../../components/ranking/Rank";
 

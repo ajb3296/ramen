@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Text, Image } from "@chakra-ui/react";
+import { Box, Image } from "@chakra-ui/react";
 
 import EggBoard from "../../images/egg_board.webp";
 import EggSelected from "../../images/egg_selected.webp";
