@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Flex, Text, Image } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { addListener, launch } from 'devtools-detector';
 
 import BottomBoardList from "../../components/game/BottomBoardList";
 
@@ -15,7 +16,7 @@ export default function Game() {
     const queryParams = new URLSearchParams(location.search);
     const name = queryParams.get("name");
     const phone = queryParams.get("phone");
-    
+
     const [score, setScore] = useState(0);
     const [time, setTime] = useState(30);
     const [isLandscape, setIsLandscape] = useState(window.innerWidth > window.innerHeight);
@@ -23,6 +24,9 @@ export default function Game() {
     const [gameStarted, setGameStarted] = useState(false);
     const [gameFinished, setGameFinished] = useState(false);
     const [showScore, setShowScore] = useState(false);
+
+    const view = document.createElement('div');
+    document.body.appendChild(view);
 
     // 각 요리에 들어간 재료 수
     const [dishStatus, setDishStatus] = useState([0, 0, 0]);
@@ -44,6 +48,17 @@ export default function Game() {
         6: "soup"
     });
 
+    // 개발자 도구 감지
+    addListener((isOpen) => {
+        if (isOpen) {
+            alert("불법 소프트웨어가 감지되었습니다. 게임을 진행할 수 없습니다.")
+            navigate('/');
+        }
+    });
+
+    // 2. Launch detection
+    launch();
+
     // 게임 종료 후 점수 표시 및 메인 페이지로 리다이렉트
     useEffect(() => {
         if (gameFinished) {
@@ -55,7 +70,7 @@ export default function Game() {
             // TODO: 여기에 점수 업데이트 API 호출 코드 작성하기
 
 
-            
+
 
             // 4초 후 메인 페이지로 리다이렉트 (2초 대기 + 2초 점수 표시)
             const redirectTimer = setTimeout(() => {
