@@ -25,10 +25,48 @@ export default function Main() {
         return () => window.removeEventListener("resize", updateVh);
     }, []);
 
+    // 전화번호 형식 검증 함수
+    const validatePhoneNumber = (phoneNumber) => {
+        // 빈 문자열이면 true 반환 (선택적 입력이므로)
+        if (phoneNumber.trim() === "") return true;
+        
+        // 숫자만 추출
+        const numberOnly = phoneNumber.replace(/[^0-9]/g, "");
+        
+        // 휴대폰 번호 패턴
+        const phonePattern = /^01[016789][0-9]{7,8}$/;
+        
+        return phonePattern.test(numberOnly);
+    };
+
+    // 전화번호 형식화 함수
+    const formatPhoneNumber = (phoneNumber) => {
+        const numbers = phoneNumber.replace(/[^0-9]/g, "");
+        
+        if (numbers.length <= 3) return numbers;
+        if (numbers.length <= 7) return numbers.slice(0, 3) + "-" + numbers.slice(3);
+        return numbers.slice(0, 3) + "-" + numbers.slice(3, 7) + "-" + numbers.slice(7, 11);
+    };
+
+    // 전화번호 입력 처리 함수
+    const handlePhoneChange = (e) => {
+        const formattedNumber = formatPhoneNumber(e.target.value);
+        setPhone(formattedNumber);
+    };
+
     const handleSubmit = () => {
         if (name.trim() === "") {
             toast({
                 title: "요리사 이름을 입력해주세요.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
+        } else if (phone.trim() !== "" && !validatePhoneNumber(phone)) {
+            toast({
+                title: "올바른 휴대폰 번호 형식이 아닙니다.",
+                description: "010, 011, 016, 017, 018, 019로 시작하는 번호만 입력 가능합니다.",
                 status: "error",
                 duration: 3000,
                 isClosable: true,
@@ -143,7 +181,9 @@ export default function Main() {
                                     height="80%"
                                     width="90%"
                                     _placeholder={{ color: "gray.600" }}
-                                    onChange={(e) => setPhone(e.target.value)}
+                                    value={phone}
+                                    onChange={handlePhoneChange}
+                                    maxLength={13}
                                 />
                             </Flex>
                         </Flex>

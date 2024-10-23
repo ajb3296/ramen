@@ -1,22 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Flex, Text, Image, Button } from "@chakra-ui/react";
+import axios from 'axios';
+import { useQuery } from 'react-query';
 
 import Rank from "../../components/ranking/Rank";
+import { BASE_URL } from "../../utils/url";
 
 import Fire from "../../images/fire.webp";
 import Restart from "../../images/restart_button.webp";
 
+const fetchRanking = async ({ queryKey }) => {
+    const [path] = queryKey;
+    const response = await axios.get(`${BASE_URL}${path}`);
+    return response.data;
+};
+
 export default function Ranking() {
     const navigate = useNavigate();
 
-    const [rank, setRank] = useState([
-        { name: "안재범", score: 700 },
-        { name: "안재범", score: 600 },
-        { name: "안재범", score: 500 },
-        { name: "안재범", score: 400 },
-        { name: "안재범", score: 300 },
-    ])
+    const [rank, setRank] = useState([])
+
+    const { data: rankingData, isLoading: loading, error: error, refetch: refetchData } = useQuery(
+        [`ranking`],
+        fetchRanking,
+        { enabled: true }
+    );
+
+    useEffect(() => {
+        if (rankingData) {
+            console.log(rankingData.ranking);
+            setRank(rankingData.ranking);
+        }
+    }, [rankingData]);
 
     return (
         <Flex backgroundColor="black" height="100vh" justifyContent="center" alignItems="center" flexDirection="column">

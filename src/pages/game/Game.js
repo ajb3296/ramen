@@ -2,13 +2,26 @@ import React, { useState, useEffect } from "react";
 import { Box, Flex, Text, Image } from "@chakra-ui/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { addListener, launch } from 'devtools-detector';
+import axios from 'axios';
+import { useQuery } from 'react-query';
 
 import BottomBoardList from "../../components/game/BottomBoardList";
+import { BASE_URL } from "../../utils/url";
 
 import BackgroundImg from "../../images/game_background.webp";
 import ScoreBoard from "../../components/game/ScoreBoard";
 import Dish from "../../components/game/Dish";
 import Fire from "../../images/fire.webp";
+
+const fetchData = async ({ queryKey }) => {
+    const [path, name, phone, score] = queryKey;
+    const response = await axios.post(`${BASE_URL}/${path}`, {
+        name,
+        phone,
+        score: parseInt(score)
+    });
+    return response.data;
+};
 
 export default function Game() {
     const location = useLocation();
@@ -59,6 +72,24 @@ export default function Game() {
     // 2. Launch detection
     launch();
 
+    const { data, isLoading, error, refetch } = useQuery(
+        [`add_score`, name, phone, score],
+        fetchData,
+        {
+            enabled: gameFinished, // gameFinished가 true일 때만 쿼리 실행
+            cacheTime: 0,
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
+            retry: false,
+            onSuccess: (data) => {
+                console.log('점수 등록 성공:', data);
+            },
+            onError: (error) => {
+                console.error('점수 등록 실패:', error);
+            }
+        }
+    );
+
     // 게임 종료 후 점수 표시 및 메인 페이지로 리다이렉트
     useEffect(() => {
         if (gameFinished) {
@@ -66,11 +97,6 @@ export default function Game() {
             const showScoreTimer = setTimeout(() => {
                 setShowScore(true);
             }, 2000);
-
-            // TODO: 여기에 점수 업데이트 API 호출 코드 작성하기
-
-
-
 
             // 4초 후 메인 페이지로 리다이렉트 (2초 대기 + 2초 점수 표시)
             const redirectTimer = setTimeout(() => {
