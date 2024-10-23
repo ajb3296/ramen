@@ -69,6 +69,29 @@ export default function Game() {
         }
     });
 
+    // 데이터 검증
+    useEffect(() => {
+        // 파라미터 존재 여부 확인
+        if (!name) {
+            navigate('/');
+            return;
+        }
+    
+        // 이름 검증 (빈 문자열이 아닌지만 확인)
+        if (name.trim() === '') {
+            alert("올바른 이름을 입력해주세요.");
+            navigate('/');
+            return;
+        }
+    
+        // 전화번호 검증
+        const cleanPhone = phone.replace(/[^0-9]/g, '');
+        if (!cleanPhone.match(/^01[016789][0-9]{7,8}$/)) {
+            navigate('/');
+            return;
+        }
+    }, []);
+
     // 2. Launch detection
     launch();
 
