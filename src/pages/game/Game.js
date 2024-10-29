@@ -64,10 +64,13 @@ export default function Game() {
     // 개발자 도구 감지
     addListener((isOpen) => {
         if (isOpen) {
-            alert("불법 소프트웨어가 감지되었습니다. 게임을 진행할 수 없습니다.")
+            // alert("불법 소프트웨어가 감지되었습니다. 게임을 진행할 수 없습니다.");
             navigate('/');
         }
     });
+
+    // 2. Launch detection
+    launch();
 
     // 데이터 검증
     useEffect(() => {
@@ -85,15 +88,14 @@ export default function Game() {
         }
     
         // 전화번호 검증
-        const cleanPhone = phone.replace(/[^0-9]/g, '');
-        if (!cleanPhone.match(/^01[016789][0-9]{7,8}$/)) {
-            navigate('/');
-            return;
+        if (phone) {
+            const cleanPhone = phone.replace(/[^0-9]/g, '');
+            if (!cleanPhone.match(/^01[016789][0-9]{7,8}$/)) {
+                navigate('/');
+                return;
+            }
         }
     }, []);
-
-    // 2. Launch detection
-    launch();
 
     const { data, isLoading, error, refetch } = useQuery(
         [`add_score`, name, phone, score],
